@@ -25,3 +25,4 @@ CREATE TABLE IF NOT EXISTS vehicle_status (
 INSERT_VEHICLE_STATUS = '''
 INSERT INTO vehicle_status (vehicle_id, report_time, status) VALUES (?, ?, ?);
 '''
+SPARK_APP_NAME = "JSONtoSQLite"
