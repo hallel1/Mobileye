@@ -1,6 +1,7 @@
 import pyspark.sql.functions as F
 
-def read_objects_detection_events(df):
+
+def parser_objects_detection_events(df):
     df_exploded = df.select(F.explode("objects_detection_events").alias("events"))
 
     df_detections = df_exploded \
@@ -14,7 +15,7 @@ def read_objects_detection_events(df):
     return df_detections
 
 
-def read_vehicle_status(df):
+def parser_vehicle_status(df):
     df_exploded = df.select(F.explode("vehicle_status").alias("vehicle_status"))
 
     df_detections = df_exploded \
