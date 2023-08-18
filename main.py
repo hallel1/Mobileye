@@ -1,3 +1,4 @@
+import queue
 import time
 
 import pyspark.sql.functions as F
@@ -6,9 +7,9 @@ from pyspark.sql import SparkSession
 from watchdog.observers import Observer
 
 import consts
-from spark_config import set_spark_config
 from handler_watcher import HandlerWatcher
-import queue
+from json_parser import parse_json_file
+from spark_config import set_spark_config
 
 
 def main():
@@ -31,16 +32,36 @@ def watcher(spark):
         while True:
             if not file_queue.empty():
                 file_path = file_queue.get()
-                identifier_file(file_path)
+                data = read_file(file_path)
+                raw_df = create_dataframe_from_json(spark, data)
+                df = identifier_file(file_path, raw_df)
             else:
-                time.sleep(5)
+                time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
         print("Observer Stopped")
+    except Exception as e:
+        print(e)
     observer.join()
 
 
-def identifier_file(file_path):
+def read_file(file_path):
+    return parse_json_file(file_path)
+
+
+def create_dataframe_from_json(spark, data):
+    return spark.read.json(spark.sparkContext.parallelize([data]))
+
+
+def identifier_file(file_path, data):
+    function_map = {
+        "objects_detection": read_objects_detection_events,
+        "vehicle_status": read_vehicle_status,
+    }
+    for s, func in function_map.items():
+        if s in file_path:
+            return func(data)
+    raise Exception("Invalid file name.")
 
 
 def read_objects_detection_events(df):
