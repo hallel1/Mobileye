@@ -1,6 +1,13 @@
-from parser_files import read_vehicle_status, read_objects_detection_events
+from parser_files import parser_vehicle_status, parser_objects_detection_events
 from sqlite_manager import SQLiteManager
-CREATE TABLE IF NOT EXISTS detection_data (
+SPARK_APP_NAME = "JSONtoSQLite"
+DIRECTORY_TO_WATCH = "./data"
+
+# File Paths
+JSON_FILE = 'input.json'
+DATABASE_FILE = 'detections.db'
+
+# SQL Statements
 CREATE_OBJECT_DETECTION_TABLE = '''
 CREATE TABLE IF NOT EXISTS object_detection (
     detection_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,13 +19,13 @@ CREATE TABLE IF NOT EXISTS object_detection (
 '''
 
 INSERT_DETECTION_DATA = '''
-INSERT INTO detection_data (vehicle_id, detection_time, object_type, object_value)
+INSERT INTO object_detection (vehicle_id, detection_time, object_type, object_value)
 VALUES (?, ?, ?, ?)
 '''
 
 CREATE_VEHICLE_STATUS_TABLE = '''
 CREATE TABLE IF NOT EXISTS vehicle_status (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    status_id INTEGER PRIMARY KEY AUTOINCREMENT,
     vehicle_id TEXT NOT NULL,
     report_time TEXT NOT NULL,
     status TEXT NOT NULL
@@ -28,19 +35,15 @@ CREATE TABLE IF NOT EXISTS vehicle_status (
 INSERT_VEHICLE_STATUS = '''
 INSERT INTO vehicle_status (vehicle_id, report_time, status) VALUES (?, ?, ?);
 '''
-SPARK_APP_NAME = "JSONtoSQLite"
+
+SQLITE_TABLES = [CREATE_OBJECT_DETECTION_TABLE, CREATE_VEHICLE_STATUS_TABLE]
+
+# JDBC settings
 JDBC_FORMAT = 'jdbc'
 JDBC_URL = 'jdbc:sqlite:/path/to/your/sqlite.db'
 JDBC_DRIVER = 'org.sqlite.JDBC'
 JDBC_DBTABLE = 'detection_data'
 
-data = """{
-  "objects_detection_events": [
-    {
-      "vehicle_id": "ebab5f787798416fb2b8afc1340d7a4e",
-      "detection_time": "2022-06-05T21:02:34.546Z",
 
-FUNCTIONS_MAP = {
-    "objects_detection": read_objects_detection_events,
-    "vehicle_status": read_vehicle_status,
-}
+PARSER_FILE = 0
+INSERT_TO_DB = 1
