@@ -1,6 +1,8 @@
 from parser_files import read_vehicle_status, read_objects_detection_events
-CREATE_DETECTION_DATA_TABLE = '''
+from sqlite_manager import SQLiteManager
 CREATE TABLE IF NOT EXISTS detection_data (
+CREATE_OBJECT_DETECTION_TABLE = '''
+CREATE TABLE IF NOT EXISTS object_detection (
     detection_id INTEGER PRIMARY KEY AUTOINCREMENT,
     vehicle_id TEXT NOT NULL,
     detection_time TEXT NOT NULL,
@@ -27,6 +29,10 @@ INSERT_VEHICLE_STATUS = '''
 INSERT INTO vehicle_status (vehicle_id, report_time, status) VALUES (?, ?, ?);
 '''
 SPARK_APP_NAME = "JSONtoSQLite"
+JDBC_FORMAT = 'jdbc'
+JDBC_URL = 'jdbc:sqlite:/path/to/your/sqlite.db'
+JDBC_DRIVER = 'org.sqlite.JDBC'
+JDBC_DBTABLE = 'detection_data'
 
 data = """{
   "objects_detection_events": [
