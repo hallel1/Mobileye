@@ -1,3 +1,4 @@
+from parser_files import read_vehicle_status, read_objects_detection_events
 CREATE_DETECTION_DATA_TABLE = '''
 CREATE TABLE IF NOT EXISTS detection_data (
     detection_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,3 +33,8 @@ data = """{
     {
       "vehicle_id": "ebab5f787798416fb2b8afc1340d7a4e",
       "detection_time": "2022-06-05T21:02:34.546Z",
+
+FUNCTIONS_MAP = {
+    "objects_detection": read_objects_detection_events,
+    "vehicle_status": read_vehicle_status,
+}
