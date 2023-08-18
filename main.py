@@ -3,9 +3,11 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 import consts
+from spark_config import set_spark_config
 
 
 def main():
+    set_spark_config()
     conf = SparkConf().setAppName(consts.SPARK_APP_NAME)
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     df = spark.read.json(spark.sparkContext.parallelize([consts.data]))
