@@ -1,4 +1,5 @@
 import sqlite3
+
 import consts
 
 
@@ -15,7 +16,7 @@ class SQLiteManager:
 
     def insert_detection_objects(self, vehicle_id, detection_time, object_type, object_value):
         self.cursor.execute(consts.INSERT_DETECTION_DATA, (vehicle_id, detection_time, object_type, object_value))
-        print("inserted")
+
     def insert_detection_data(self, vehicle_id, report_time, status):
         self.cursor.execute(consts.INSERT_VEHICLE_STATUS, (vehicle_id, report_time, status))
 

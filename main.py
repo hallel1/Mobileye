@@ -62,7 +62,6 @@ def run_new_file_process(spark, file_path, sqLite):
     raw_df = create_dataframe_from_json(spark, data)
     functions_array = identifier_file(file_path, functions_map)
     df = parser_file(functions_array, raw_df)
-    df.printSchema()
     insert_to_db(functions_array, df)
 
 
@@ -72,7 +71,6 @@ def parser_file(functions_array, raw_df):
 
 def insert_to_db(functions_array, df):
     rows = [list(row) for row in df.collect()]
-    print(rows)
     for row in rows:
         functions_array[consts.INSERT_TO_DB](*row)
 
