@@ -1,16 +1,46 @@
+import time
+
 import pyspark.sql.functions as F
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
+from watchdog.observers import Observer
 
 import consts
 from spark_config import set_spark_config
+from handler_watcher import HandlerWatcher
+import queue
 
 
 def main():
     set_spark_config()
     conf = SparkConf().setAppName(consts.SPARK_APP_NAME)
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
-    df = spark.read.json(spark.sparkContext.parallelize([consts.data]))
+
+    watcher(spark)
+    spark.stop()
+
+
+def watcher(spark):
+    file_queue = queue.Queue()
+    observer = Observer()
+    event_handler = HandlerWatcher(file_queue)
+    event_handler.set_spark(spark)
+    observer.schedule(event_handler, consts.DIRECTORY_TO_WATCH, recursive=True)
+    observer.start()
+    try:
+        while True:
+            if not file_queue.empty():
+                file_path = file_queue.get()
+                identifier_file(file_path)
+            else:
+                time.sleep(5)
+    except KeyboardInterrupt:
+        observer.stop()
+        print("Observer Stopped")
+    observer.join()
+
+
+def identifier_file(file_path):
 
 
 def read_objects_detection_events(df):
